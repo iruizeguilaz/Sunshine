@@ -72,6 +72,8 @@ public class MainActivityFragment extends Fragment {
                 return null;
             }
             forecastJsonStr = buffer.toString();
+
+
             return forecastJsonStr;
         } catch (IOException e) {
             Log.e("PlaceholderFragment", "Error ", e);
