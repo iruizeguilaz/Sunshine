@@ -1,6 +1,7 @@
 package com.nanodegree.iruizeguilaz.sunshine;
 
 import android.content.Context;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -143,11 +144,12 @@ public class ForecastFragment extends Fragment {
     }
 
 
-    public class FetchWeatherTask extends AsyncTask<Void, Void, Void> {
+    public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
         private final String log_Tag = FetchWeatherTask.class.getSimpleName();
 
-        protected Void doInBackground(Void... params) {
+
+        protected Void doInBackground(String... params) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             // Will contain the raw JSON response as a string.
@@ -158,6 +160,23 @@ public class ForecastFragment extends Fragment {
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
                 URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&mode=json&units=metric&cnt=7");
+
+                String codePost = params[0];
+
+// TODO usar variables para cada append
+
+                Uri.Builder builder = new Uri.Builder();
+                builder.scheme("http")
+                        .authority("api.openweathermap.org")
+                        .appendPath("data")
+                        .appendPath("2.5")
+                        .appendPath("forecast")
+                        .appendPath("daily")
+                        .appendQueryParameter("q", "94043")
+                        .appendQueryParameter("units", "metric")
+                        .appendQueryParameter("cnt", "7");
+                url = new URL(builder.build().toString());
+
                 // Create the request to OpenWeatherMap, and open the connection
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -227,6 +246,11 @@ public class ForecastFragment extends Fragment {
 
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
         listView.setAdapter(mForecastAdapter);
+
+        FetchWeatherTask task=new FetchWeatherTask();
+        task.execute("01010");
+
+
         return rootView;
     }
 
@@ -248,10 +272,6 @@ public class ForecastFragment extends Fragment {
             CharSequence text = item.getTitle();
             int duration = Toast.LENGTH_SHORT;
             Toast.makeText(getActivity(), text, duration).show();
-
-
-            FetchWeatherTask task=new FetchWeatherTask();
-            task.execute();
 
             return true;
         }
