@@ -118,8 +118,7 @@ public class ForecastFragment extends Fragment {
 
         try {
             //JSONTokener tokener = new JSONTokener(weather);
-            //JSONObject jsonObj = new JSONObject(weather);
-            //JSONArray finalResult = new JSONArray(jsonObj.getJSONArray("list"));
+
 
 
 
@@ -202,6 +201,11 @@ public class ForecastFragment extends Fragment {
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
+
+                JSONObject jsonObj = new JSONObject(forecastJsonStr);
+                JSONArray finalResult = jsonObj.getJSONArray("list");
+                JSONObject row = finalResult.getJSONObject(1);
+                double maxTemp = row.getJSONObject("temp").getDouble("max");
 
 
                 //return forecastJsonStr;
