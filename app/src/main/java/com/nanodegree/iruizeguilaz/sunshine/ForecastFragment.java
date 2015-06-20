@@ -110,7 +110,7 @@ public class ForecastFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.forecastfragment, menu);
-        super.onCreateOptionsMenu(menu,inflater);
+        super.onCreateOptionsMenu(menu, inflater);
     }
 
 
@@ -124,7 +124,24 @@ public class ForecastFragment extends Fragment {
             updateWeather();
             return true;
         }
+        if (id == R.id.action_map) {
+            loadMap();
+            return true;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void loadMap() {
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        //MyApp appState = ((MyApp)getActivity().getApplicationContext());
+        Uri gmmIntentUri = Uri.parse("geo:0,0?").buildUpon().appendQueryParameter("id", location).build();
+        Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+        mapIntent.setPackage("com.google.android.apps.maps");
+        if (mapIntent.resolveActivity(getActivity().getPackageManager()) != null) {
+            startActivity(mapIntent);
+        }
     }
 
     private void updateWeather() {
@@ -193,6 +210,10 @@ public class ForecastFragment extends Fragment {
             final String OWM_MAX = "max";
             final String OWM_MIN = "min";
             final String OWM_DESCRIPTION = "main";
+            final String OWM_CITY = "city";
+            final String OWM_CORDENADAS = "coord";
+            final String OWM_LON = "lon";
+            final String OWM_LAT = "lat";
 
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
@@ -200,6 +221,13 @@ public class ForecastFragment extends Fragment {
             // OWM returns daily forecasts based upon the local time of the city that is being
             // asked for, which means that we need to know the GMT offset to translate this data
             // properly.
+
+            // guardar las coordenadas en la opcion setting para luego usarla cuando se lance.
+            JSONObject coordenadasJson = forecastJson.getJSONObject(OWM_CITY).getJSONObject(OWM_CORDENADAS);
+            String coordenadas = coordenadasJson.getString(OWM_LON) +","+ coordenadasJson.getString(OWM_LAT);
+// TODO GUARDAR COORDENADAS
+            MyApp appState = ((MyApp)getActivity().getApplicationContext());
+            appState.setCoordenadas(coordenadas);
 
             // Since this data is also sent in-order and the first day is always the
             // current day, we're going to take advantage of that to get a nice
